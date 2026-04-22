@@ -1,4 +1,12 @@
-a4a3638ad0cef4aede15a717cc9e6d7e *DESCRIPTION
+ae9620414de808aebaf0213cf44520ac *DESCRIPTION
 6bfa304614664e92260c750accde6547 *NAMESPACE
-1de37fdf395f97582604b521bcd8a6b1 *R/MIRDD.R
-f8ce241831a184d5a92996c858cf1beb *man/MIdiagRDD.Rd
+3717c835c259ea38eb689ddb4f9b785f *R/MIRDD-package.R
+a8f51e6f3c6970d15a8163e11f2379dd *R/MIRDD.R
+9ca5312ef44ea1a729ee169f3fd02a6b *R/data.R
+cb3b20077bebc5da31fc1b46c657c0ff *build/partial.rdb
+13ee262914438ac2db83611e6254e3af *data/LudwigMiller2007Modified.rda
+baf088ff35b45357c65d577b525d06af *data/lee2008.rda
+f5d171ebc41dcc2e5680dae1218f9323 *man/LudwigMiller2007Modified.Rd
+152cf40abd2b0ebeed46e23e9e300105 *man/MIRDD-package.Rd
+c12a8a76147a0c0860e75448303b9387 *man/MIdiagRDD.Rd
+c7766c5ff6b6a525a8cd36b5644bd502 *man/lee2008.Rd
