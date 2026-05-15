@@ -17,10 +17,7 @@
 #' treatment effect at the cutoff. Communications in Statistics - Simulation and
 #' Computation 52 (9): 4293-4312. \doi{10.1080/03610918.2021.1960374}
 #'
-#' @seealso
-#' Useful links:
-#' \itemize{
-#'   \item \doi{10.1080/03610918.2021.1960374}
-#' }
+#' Takahashi, M. 2026. MIRDD: An R package for multiple imputation regression
+#' discontinuity design. SoftwareX 34(102707): 1-6. \doi{10.1016/j.softx.2026.102707}
 #'
 "_PACKAGE"

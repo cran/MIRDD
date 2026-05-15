@@ -52,6 +52,8 @@
 #' @references
 #' Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 53(9): 4293-4312. \doi{10.1080/03610918.2021.1960374}
 #'
+#' Takahashi, M. 2026. MIRDD: An R package for multiple imputation regression discontinuity design. SoftwareX 34(102707): 1-6. \doi{10.1016/j.softx.2026.102707}
+#'
 #' Calonico, S., Cattaneo, M.D., and Titiunik, R. 2015. rdrobust: An R Package for robust nonparametric inference in regression-discontinuity designs. R Journal 7(1): 38-51. \doi{10.32614/RJ-2015-004}
 #'
 #' Honaker, J., King, G., and Blackwell, M. 2011. Amelia II: A program for missing data. Journal of Statistical Software 45(7): 1-47. \doi{10.18637/jss.v045.i07}
@@ -70,29 +72,29 @@
 MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1, emp = 0,
                       bw = "mserd", ker = "triangular", h = NULL, type = "Conventional",
                       p1 = 1, conf = 95, upper = 1, covs1 = NULL, up = NULL, lo = NULL) {
-
+  
   if (!is.null(seed)) set.seed(seed)
-
+  
   # Saving and Restoring Drawing Settings
   oldpar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(oldpar))
-
+  
   # --- 1. Data Formatting ---
   df1 <- stats::na.omit(data.frame(x = x, y = y))
   p1 <- min(p1, 2)
   x1_all <- df1$x
   y3_all <- df1$y
   d_all  <- if (upper == 1) as.numeric(x1_all >= cut) else as.numeric(x1_all < cut)
-
+  
   y0_all <- ifelse(d_all == 0, y3_all, NA)
   y1_all <- ifelse(d_all == 1, y3_all, NA)
-
+  
   data3_all <- data.frame(y3 = y3_all, x1 = x1_all, d = d_all)
   if (!is.null(covs1)) data3_all <- cbind(data3_all, covs1)
-
+  
   # --- 2. Bandwidth ---
   rbd1 <- rdrobust::rdrobust(y3_all, x1_all, c = cut, kernel = ker, bwselect = bw, p = p1, covs = covs1)
-
+  
   if (!is.null(h)) {
     if (length(h) == 1) {
       h1 <- h
@@ -102,16 +104,10 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
       h2 <- h[2]
     }
   } else {
-    if (type == "Conventional") {
-      h1 <- rbd1$bws[1, 1]
-      h2 <- rbd1$bws[1, 2]
-    } else {
-      # Bias-Corrected or Robust
-      h1 <- rbd1$bws[2, 1]
-      h2 <- rbd1$bws[2, 2]
-    }
+    h1 <- rbd1$bws[1, 1]
+    h2 <- rbd1$bws[1, 2]
   }
-
+  
   # Extracting data within bandwidth
   in_bw  <- (cut - h1 <= x1_all) & (x1_all <= cut + h2)
   data2a <- data.frame(y0 = y0_all[in_bw], y1 = y1_all[in_bw], x1 = x1_all[in_bw])
@@ -119,15 +115,10 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
     covs_sub <- if(is.vector(covs1)) covs1[in_bw] else covs1[in_bw, , drop=FALSE]
     data2a   <- cbind(data2a, covs_sub)
   }
-
-  # If Bias-Corrected or Robust, then use x1^2
-  if (type != "Conventional") {
-    data2a$x2 <- (data2a$x1)^2
-  }
-
+  
   MIn <- nrow(data2a)
   da  <- if (upper == 1) as.numeric(data2a$x1 >= cut) else as.numeric(data2a$x1 < cut)
-
+  
   # --- 3. Naive Estimator ---
   y1n_v <- stats::na.omit(data2a$y1); y0n_v <- stats::na.omit(data2a$y0)
   n1n <- length(y1n_v); n0n <- length(y0n_v)
@@ -135,15 +126,15 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
   dfna <- (se1n^2 + se0n^2)^2 / (se1n^4/(n1n-1) + se0n^4/(n0n-1))
   naive1 <- mean(y1n_v) - mean(y0n_v)
   naive2 <- se1n + se0n
-
-  # --- 4. MI: Amelia ---
+  
+  # --- 4. MIRDD: Amelia ---
   a.out <- Amelia::amelia(data2a, p2s = p2s1, m = M1, empri = emp * MIn)
   if (is.null(up)) up <- max(y3_all, na.rm = TRUE)
   if (is.null(lo)) lo <- min(y3_all, na.rm = TRUE)
-
+  
   tauhata <- matrix(NA, MIn, M1); tauhat0 <- matrix(NA, MIn, M1); tauhat1 <- matrix(NA, MIn, M1)
   nMIa1 <- numeric(M1); nMIa2 <- numeric(M1)
-
+  
   for (i in 1:M1) {
     y1i <- a.out$imputations[[i]]$y1; y0i <- a.out$imputations[[i]]$y0
     y1i[y1i > up] <- up; y1i[y1i < lo] <- lo
@@ -152,7 +143,7 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
     nMIa1[i] <- mean(tauhata[, i]); nMIa2[i] <- stats::var(tauhata[, i]) / MIn
   }
   mia1 <- mean(nMIa1); mia2 <- sqrt(mean(nMIa2) + (1 + 1/M1) * stats::var(nMIa1))
-
+  
   # --- 5. RDD ---
   if (type == "Bias-Corrected") {
     modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, all = TRUE, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
@@ -171,29 +162,29 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
     rddb2 <- modelRDD1$se[1]
     rdd_n_eff <- sum(modelRDD1$N_h)
   }
-
+  
   # --- 6. Graph Plotting ---
   graphics::layout(matrix(1:12, 3, 4, byrow = TRUE))
-
+  
   graphics::hist(nMIa1, xlim = range(c(nMIa1, rddb1, naive1)), main = "1.MIRDD, RDD, Naive", xlab = "ATE at cutoff")
   graphics::abline(v = c(rddb1, naive1), col = c(2, 1), lwd = 2)
   graphics::hist(nMIa1, xlim = range(c(nMIa1, rddb1)), main = "2.MIRDD and RDD", xlab = "ATE at cutoff")
   graphics::abline(v = rddb1, col = 2, lwd = 2)
-
+  
   y0n_o <- data2a$y0[da == 0]; y1n_o <- data2a$y1[da == 1]
   rng_x_den <- range(c(tauhat0, tauhat1, y0n_o, y1n_o))
   graphics::plot(stats::density(y0n_o), xlim = rng_x_den, lwd = 2, col = 8, main = "3.Densities (Ctrl)")
   for (i in 1:M2) graphics::lines(stats::density(tauhat0[, i][a.out$missMatrix[, 1]]), col = 2, lty = 2)
   graphics::plot(stats::density(y1n_o), xlim = rng_x_den, lwd = 2, col = 4, main = "4.Densities (Trt)")
   for (i in 1:M2) graphics::lines(stats::density(tauhat1[, i][a.out$missMatrix[, 2]]), col = 2, lty = 2)
-
+  
   miss0 <- a.out$missMatrix[, 1]; miss1 <- a.out$missMatrix[, 2]
   rng_ys <- range(y3_all); rng_xs <- range(x1_all)
-
+  
   graphics::plot(x1_all[d_all==0], y0_all[d_all==0], xlim = rng_xs, ylim = rng_ys, col = 8, pch = 1, main = "5.Observed Values", xlab="x", ylab="y")
   graphics::points(x1_all[d_all==1], y1_all[d_all==1], col = 4, pch = 2)
   graphics::abline(v = cut, lwd = 1)
-
+  
   graphics::plot(x1_all[d_all==0], y0_all[d_all==0], xlim = rng_xs, ylim = rng_ys, col = 8, pch = 1, main = "6.Observed & Imputed", xlab="x", ylab="y")
   graphics::points(x1_all[d_all==1], y1_all[d_all==1], col = 4, pch = 2)
   for (i in 1:M3) {
@@ -201,40 +192,40 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
     graphics::points(data2a$x1[miss0], tauhat0[miss0, i], col = 2, pch = 1, cex = 1.0)
   }
   graphics::abline(v = cut, lwd = 1)
-
+  
   graphics::plot(x1_all[d_all==0], y0_all[d_all==0], xlim = rng_xs, ylim = rng_ys, col = 8, pch = 1, main = "7.Obs & Imp (Ctrl)", xlab="x", ylab="y")
   for (i in 1:M3) graphics::points(data2a$x1[miss0], tauhat0[miss0, i], col = 2, pch = 1, cex = 1.0)
   graphics::abline(v = cut, lwd = 1)
-
+  
   graphics::plot(x1_all[d_all==1], y1_all[d_all==1], xlim = rng_xs, ylim = rng_ys, col = 4, pch = 2, main = "8.Obs & Imp (Trt)", xlab="x", ylab="y")
   for (i in 1:M3) graphics::points(data2a$x1[miss1], tauhat1[miss1, i], col = 2, pch = 2, cex = 1.0)
   graphics::abline(v = cut, lwd = 1)
-
+  
   graphics::plot(data2a$x1[da==0], data2a$y0[da==0], xlim = c(cut-h1, cut+h2), ylim = rng_ys, col = 8, pch = 1, main = "9.Local Reg (Ctrl)", xlab="x", ylab="y")
   for (i in 1:M2) {
     graphics::points(data2a$x1[miss0], tauhat0[miss0, i], col = 2, pch = 1, cex = 1.0)
     graphics::abline(stats::lm(tauhat0[, i] ~ data2a$x1), lwd = 1.0)
   }
-
+  
   graphics::plot(data2a$x1[da==1], data2a$y1[da==1], xlim = c(cut-h1, cut+h2), ylim = rng_ys, col = 4, pch = 2, main = "10.Local Reg (Trt)", xlab="x", ylab="y")
   for (i in 1:M2) {
     graphics::points(data2a$x1[miss1], tauhat1[miss1, i], col = 2, pch = 2, cex = 1.0)
     graphics::abline(stats::lm(tauhat1[, i] ~ data2a$x1), lwd = 1.0)
   }
-
+  
   b0 <- numeric(M1); b1 <- numeric(M1)
   for (i in 1:M1) {
     b0[i] <- stats::coef(stats::lm(tauhat0[, i] ~ data2a$x1))[2]
     b1[i] <- stats::coef(stats::lm(tauhat1[, i] ~ data2a$x1))[2]
   }
   graphics::hist(b0, main = "11.Slope (Ctrl)"); graphics::hist(b1, main = "12.Slope (Trt)")
-
+  
   # --- 7. Output ---
   cv_func <- function(df_val) stats::qt((1 - (1 - conf/100)/2), df_val)
   est <- c(mia1, rddb1, naive1)
   se  <- c(mia2, rddb2, naive2)
   dff <- c(MIn - 1, rdd_n_eff - 1, dfna)
-
+  
   output <- data.frame(
     Method = c("MIRDD", "RDD", "Naive"),
     Estimate = round(est, 4),

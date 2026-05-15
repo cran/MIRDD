@@ -13,12 +13,12 @@
 #'
 #' @source Lee, D. S. 2008. Randomized experiments from non-random selection in U.S. House elections. Journal of Econometrics 142 (2): 675-697.
 #'
-#' @references Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312.
+#' @references Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312. \doi{10.1080/03610918.2021.1960374}
 "lee2008"
 
 #' Ludwig and Miller (2007) Modified Dataset
 #'
-#' @description A modified dataset used in Takahashi (2023).
+#' @description A modified dataset used in Takahashi (2026).
 #'
 #' @usage data(LudwigMiller2007Modified)
 #'
@@ -39,5 +39,5 @@
 #'
 #' @source Ludwig, J., and D. L. Miller. 2007. Does Head Start improve children's life chances? Evidence from a regression discontinuity design. Quarterly Journal of Economics 122 (1): 159-208.
 #'
-#' @references Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312.
+#' @references Takahashi, M. 2026. MIRDD: An R package for multiple imputation regression discontinuity design. SoftwareX 34(102707): 1-6. \doi{10.1016/j.softx.2026.102707}
 "LudwigMiller2007Modified"

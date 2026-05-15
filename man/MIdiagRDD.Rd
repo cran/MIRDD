@@ -103,6 +103,8 @@ MIdiagRDD(y = y, x = x, cut = 0)
 \references{
 Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 53(9): 4293-4312. \doi{10.1080/03610918.2021.1960374}
 
+Takahashi, M. 2026. MIRDD: An R package for multiple imputation regression discontinuity design. SoftwareX 34(102707): 1-6. \doi{10.1016/j.softx.2026.102707}
+
 Calonico, S., Cattaneo, M.D., and Titiunik, R. 2015. rdrobust: An R Package for robust nonparametric inference in regression-discontinuity designs. R Journal 7(1): 38-51. \doi{10.32614/RJ-2015-004}
 
 Honaker, J., King, G., and Blackwell, M. 2011. Amelia II: A program for missing data. Journal of Statistical Software 45(7): 1-47. \doi{10.18637/jss.v045.i07}

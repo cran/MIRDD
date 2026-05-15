@@ -22,6 +22,6 @@ data(lee2008)
 A dataset used in Takahashi (2023).
 }
 \references{
-Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312.
+Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312. \doi{10.1080/03610918.2021.1960374}
 }
 \keyword{datasets}

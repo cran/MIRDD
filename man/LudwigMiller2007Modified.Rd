@@ -27,9 +27,9 @@ Ludwig, J., and D. L. Miller. 2007. Does Head Start improve children's life chan
 data(LudwigMiller2007Modified)
 }
 \description{
-A modified dataset used in Takahashi (2023).
+A modified dataset used in Takahashi (2026).
 }
 \references{
-Takahashi, M. 2023. Multiple imputation regression discontinuity designs: Alternative to regression discontinuity designs to estimate the local average treatment effect at the cutoff. Communications in Statistics - Simulation and Computation 52 (9): 4293-4312.
+Takahashi, M. 2026. MIRDD: An R package for multiple imputation regression discontinuity design. SoftwareX 34(102707): 1-6. \doi{10.1016/j.softx.2026.102707}
 }
 \keyword{datasets}
