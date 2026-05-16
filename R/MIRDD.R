@@ -146,18 +146,18 @@ MIdiagRDD <- function(y, x, cut, seed = NULL, M1 = 100, M2 = 5, M3 = 1, p2s1 = 1
   
   # --- 5. RDD ---
   if (type == "Bias-Corrected") {
-    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, all = TRUE, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
+    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
     rddb1 <- modelRDD1$Estimate[2]
     rddb2 <- modelRDD1$se[1]
     rdd_n_eff <- sum(modelRDD1$N_b)
   } else if (type == "Robust") {
-    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, all = TRUE, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
+    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
     rddb1 <- modelRDD1$Estimate[2]
     rddb2 <- modelRDD1$se[2]
     rdd_n_eff <- sum(modelRDD1$N_b)
   } else {
     # Conventional (Default)
-    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, all = TRUE, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
+    modelRDD1 <- rdrobust::rdrobust(data3_all$y3, data3_all$x1, c = cut, h = c(h1, h2), kernel = ker, p = p1, covs = covs1)
     rddb1 <- modelRDD1$Estimate[1]
     rddb2 <- modelRDD1$se[1]
     rdd_n_eff <- sum(modelRDD1$N_h)
